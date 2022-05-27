@@ -1,0 +1,7 @@
+Para trabajar en este proyecto, todos los .h se pondran en la carpeta inc, y los .c en la carpeta src. se ha modificado el MakeFile para que cree el punto de montaje en la carpeta FUSE_PROJECT.
+Para empezar primero hacer un make en la carpeta src y luego make mount para que monte el sistema de ficheros.
+
+
+-------------------------------------------------------
+el otro archivo readme es el enunciado del profesor.
+-------------------------------------------------------
