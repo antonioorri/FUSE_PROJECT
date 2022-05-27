@@ -1,2 +1,2 @@
 # FUSE_PROJECT
-Proyecto de la universidad, driver para controlar un sistema FUSE.
+Proyecto de la universidad, sistema de ficheros con FUSE.
