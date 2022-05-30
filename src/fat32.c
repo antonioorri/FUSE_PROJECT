@@ -299,6 +299,28 @@ static int FAT32_getattr(const char *path, struct stat *stbuf)
 }
 
 
+/*
+ * Completar
+ */
+static int mi_open(const char* path, struct fuse_file_info* fi){
+	
+	
+	
+}
+
+/*
+ * Completar
+ */
+
+static int mi_read(const char* path, char* buf, size_t size, off_t offset,
+                   struct fuse_file_info* fi)
+{
+	
+	
+	
+}
+
+
 /***********************************
  * operaciones FUSE
  * */
@@ -314,7 +336,7 @@ static struct fuse_operations basic_oper = {
 int main(int argc, char *argv[])
 {
     struct structura_mis_datos *mis_datos;
-
+		
     mis_datos=malloc(sizeof(struct structura_mis_datos));
 
     // análisis parámetros de entrada

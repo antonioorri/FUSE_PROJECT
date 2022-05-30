@@ -29,7 +29,7 @@ debug: $(TARGET)
 
 umount:
 	fusermount -u $(montaje)
-
+	rm -rf $(montaje)
 .PHONY : clean
 clean:
 	rm -f *.o fat32	
