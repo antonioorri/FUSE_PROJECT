@@ -2,7 +2,8 @@ montaje= ../punto_montaje
 fichero= $(INC_DIR)/file.img
 fuse_flags= -D_FILE_OFFSET_BITS=64 -lfuse -pthread
 
-CFLAGS = -Wall -O3 -I$(INC_DIR)
+CFLAGS = -Wall -O0 -I$(INC_DIR)
+
 TARGET = $(BIN_DIR)/fat32
 OBJS   = $(OBJ_DIR)/fat32.o
 CC     = gcc
