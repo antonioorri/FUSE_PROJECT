@@ -9,6 +9,8 @@
 
 #include "fat32.h"
 
+//version 0.1
+
 // lee posición i de la FAT
 int32_t readFAT(int32_t i, struct structura_mis_datos *mis_datos)
 {
