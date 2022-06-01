@@ -55,5 +55,10 @@ void error_parametros();
  * lee fichero con los capítulos y rellena estructura mis_datos
  * */
 void leer_fichero(struct structura_mis_datos *mis_datos);
+/***********************************
+ * crear fichero con los capítulos y rellena estructura mis_datos
+ * */
+int crear_fichero(const char *path, char *nombre, struct structura_mis_datos *mis_datos);
+
 
 #endif

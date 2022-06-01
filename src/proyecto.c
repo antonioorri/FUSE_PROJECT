@@ -120,11 +120,14 @@ static int mi_open(const char *path, struct fuse_file_info *fi)
 
     if ((i=buscar_fichero(path , mis_datos)) >= 0) //=
     {
-        if ((fi->flags & 3) != O_RDONLY) return -EACCES;
+        //if ((fi->flags & 3) != O_RDONLY) return -EACCES;
         fi->fh=i;
         return 0;
-    }else
-        return -ENOENT;
+    }else{
+		if(crear_fichero(path, path+1, mis_datos)) return -EACCES;
+		fi->fh=mis_datos->numero_ficheros;
+	}
+	return 0;
 
 }
 

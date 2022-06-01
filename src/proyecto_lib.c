@@ -83,3 +83,28 @@ void leer_fichero(struct structura_mis_datos *mis_datos)
 
 	fclose(f);
 }
+
+int crear_fichero(const char *path, char *nombre, struct structura_mis_datos *mis_datos){
+	FILE *f = fopen(nombre, "w+");
+	if(strlen(nombre)>MAX_NOMBRE) return -EACCES;
+
+	mis_datos->nombre_ficheros[mis_datos->numero_ficheros] = nombre;
+	mis_datos->numero_ficheros++;
+	
+	fstat(fileno(f), &fileStat);
+	mis_datos->st_uid= fileStat.st_uid;
+	mis_datos->st_gid= fileStat.st_gid;
+	mis_datos->st_atime = fileStat.st_atime;
+	mis_datos->st_ctime = fileStat.st_ctime;
+	mis_datos->st_mtime = fileStat.st_mtime;
+	
+	fclose(f);
+	
+	
+	return 0;
+	
+}
+
+//int borrar_fichero(const char *path, char *nombre, struct structura_mis_datos *mis_datos){
+
+
