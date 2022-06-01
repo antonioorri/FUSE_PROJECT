@@ -31,8 +31,8 @@
  *
  * */
 
-static const char* big_path = "/BIG";
-static const char* little_path = "/little";
+static const char* cuerdas_path = "/cuerda";
+static const char* viento_path = "/viento";
 
 /***********************************
  * */
@@ -47,7 +47,7 @@ static int mi_getattr(const char *path, struct stat *stbuf)
 
 	memset(stbuf, 0, sizeof(struct stat));
 	if (strcmp(path, "/") == 0) {
-		stbuf->st_mode = S_IFDIR | 0755;
+		stbuf->st_mode = S_IFDIR | 0777;
 		stbuf->st_nlink = 2;
 		stbuf->st_uid = mis_datos->st_uid;
 		stbuf->st_gid = mis_datos->st_gid;
@@ -59,67 +59,8 @@ static int mi_getattr(const char *path, struct stat *stbuf)
 		stbuf->st_blocks = 8; //tamaño dividido entre 512 //8 anterior 2
 		//aqui se controlan los directorios nuevos
 
-	} else if (strcmp(path, big_path) == 0) {
-        stbuf->st_mode = S_IFDIR | 0755;
-        stbuf->st_nlink = 2;
-        stbuf->st_uid = mis_datos->st_uid;
-        stbuf->st_gid = mis_datos->st_gid;
-
-        stbuf->st_atime = mis_datos->st_atime;
-        stbuf->st_mtime = mis_datos->st_mtime;
-        stbuf->st_ctime = mis_datos->st_ctime;
-        stbuf->st_size = 4096;
-        stbuf->st_blocks = 2;
-
-
-	  } else if (strcmp(path, little_path) == 0) {
-        stbuf->st_mode = S_IFDIR | 0755;
-        stbuf->st_nlink = 2;
-        stbuf->st_uid = mis_datos->st_uid;
-        stbuf->st_gid = mis_datos->st_gid;
-
-        stbuf->st_atime = mis_datos->st_atime;
-        stbuf->st_mtime = mis_datos->st_mtime;
-        stbuf->st_ctime = mis_datos->st_ctime;
-        stbuf->st_size = 4096;
-        stbuf->st_blocks = 2;
-
-        } else if ((strncmp(path, "/BIG/",5)) == 0 &&
-               (i = buscar_fichero(path + (strlen(big_path)), mis_datos)) >= 0 &&
-               strlen(mis_datos->contenido_ficheros[i]) >= 256 ) {
-        stbuf->st_mode = S_IFREG | 0444;
-        stbuf->st_nlink = 1;
-
-        stbuf->st_uid = mis_datos->st_uid;
-        stbuf->st_gid = mis_datos->st_gid;
-
-        stbuf->st_atime = mis_datos->st_atime;
-        stbuf->st_mtime = mis_datos->st_mtime;
-        stbuf->st_ctime = mis_datos->st_ctime;
-
-        stbuf->st_size = strlen(mis_datos->contenido_ficheros[i]);
-        stbuf->st_blocks = stbuf->st_size / 512 + (stbuf->st_size % 512) ? 1 : 0;
-
-
-     } else if ((strncmp(path, "/little/",8)) == 0 &&
-               (i = buscar_fichero(path + (strlen(little_path)), mis_datos)) >= 0 &&
-               strlen(mis_datos->contenido_ficheros[i]) < 256) {
-        stbuf->st_mode = S_IFREG | 0444;
-        stbuf->st_nlink = 1;
-
-        stbuf->st_uid = mis_datos->st_uid;
-        stbuf->st_gid = mis_datos->st_gid;
-
-        stbuf->st_atime = mis_datos->st_atime;
-        stbuf->st_mtime = mis_datos->st_mtime;
-        stbuf->st_ctime = mis_datos->st_ctime;
-
-        stbuf->st_size = strlen(mis_datos->contenido_ficheros[i]);
-        stbuf->st_blocks = stbuf->st_size / 512 + (stbuf->st_size % 512) ? 1 : 0;
-
-
-	} else if ((i= buscar_fichero(path, mis_datos)) >= 0) {
-		stbuf->st_mode = S_IFREG | 0444;
+	} else {
+		stbuf->st_mode = S_IFREG | 0777;
 		stbuf->st_nlink = 1;
 
 		stbuf->st_uid = mis_datos->st_uid;
@@ -129,7 +70,7 @@ static int mi_getattr(const char *path, struct stat *stbuf)
 		stbuf->st_mtime = mis_datos->st_mtime;
 		stbuf->st_ctime = mis_datos->st_ctime;
 
-		stbuf->st_size = strlen(mis_datos->contenido_ficheros[i]);
+		stbuf->st_size = 512;
 		stbuf->st_blocks = stbuf->st_size/512 + (stbuf->st_size%512)? 1 : 0;
 
 	} else {
@@ -157,39 +98,13 @@ struct structura_mis_datos *mis_datos= (struct structura_mis_datos *) fuse_get_c
         if (filler(buf, ".", NULL, 0) != 0) return -ENOMEM;
         if (filler(buf, "..", NULL, 0) != 0) return -ENOMEM;
 
-        if (filler(buf, "BIG", NULL, 0) != 0) return -ENOMEM;
-        if (filler(buf, "little", NULL, 0) != 0) return -ENOMEM;
-
         for (i = 0; i < mis_datos->numero_ficheros; i++) {
             if (filler(buf, mis_datos->nombre_ficheros[i], NULL, 0) != 0) return -ENOMEM;
         }
 
-      } else if (strcmp(path, "/BIG") == 0) {
-        if (filler(buf, ".", NULL, 0) != 0) return -ENOMEM;
-        if (filler(buf, "..", NULL, 0) != 0) return -ENOMEM;
-        for (i = 0; i < mis_datos->numero_ficheros; i++) {
-            if ((strlen(mis_datos->contenido_ficheros[i])) >= 256) {
-                if (filler(buf, mis_datos->nombre_ficheros[i], NULL, 0) != 0) return -ENOMEM;
-            }
-        }
-
-	    } else if (strcmp(path, "/little") == 0) {
-        if (filler(buf, ".", NULL, 0) != 0) return -ENOMEM;
-        if (filler(buf, "..", NULL, 0) != 0) return -ENOMEM;
-        for (i = 0; i < mis_datos->numero_ficheros; i++) {
-            if ((strlen(mis_datos->contenido_ficheros[i])) < 256) {
-                if (filler(buf, mis_datos->nombre_ficheros[i], NULL, 0) != 0) return -ENOMEM;
-            }
-        }
-    } else
+      }else
         return -ENOMEM;
 
-/*	for (i=0; i< mis_datos->numero_ficheros; i++)
-	{
-		if (filler(buf,mis_datos->nombre_ficheros[i], NULL, 0) != 0)
-            return -ENOMEM;
-	}
-	*/
 	return 0;
 
 }
@@ -200,8 +115,6 @@ static int mi_open(const char *path, struct fuse_file_info *fi)
 {
 	 int i;
 
-	//printf ("hola");
-
     struct structura_mis_datos* mis_datos = (struct structura_mis_datos*)fuse_get_context()->private_data; //usarla para acceder a la estructura
 
 
@@ -210,18 +123,7 @@ static int mi_open(const char *path, struct fuse_file_info *fi)
         if ((fi->flags & 3) != O_RDONLY) return -EACCES;
         fi->fh=i;
         return 0;
-    }
-    else if ((strncmp(path, "/BIG/",5)) == 0 && (i = buscar_fichero(path + (strlen(big_path)), mis_datos)) >= 0 && strlen(mis_datos->contenido_ficheros[i]) >= 256 ){
-		if ((fi->flags & 3) != O_RDONLY) return -EACCES;
-        fi->fh=i;
-        return 0;
-    }
-    else if ((strncmp(path, "/little/",8)) == 0 && (i = buscar_fichero(path + (strlen(little_path)), mis_datos)) >= 0 && strlen(mis_datos->contenido_ficheros[i]) < 256){
-		if ((fi->flags & 3) != O_RDONLY) return -EACCES;
-        fi->fh=i;
-        return 0;
-    }
-    else
+    }else
         return -ENOENT;
 
 }

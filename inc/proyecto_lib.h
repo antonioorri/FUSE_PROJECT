@@ -29,7 +29,6 @@
 
 struct structura_mis_datos
 {
-	char *fichero_inicial;  				/* fichero que contiene los capítulos */
 	int numero_ficheros;     				/* número de capitulos encontrados */
 	char *nombre_ficheros[MAX_FICHEROS];	/* nombre de los capítulos */
 	char *contenido_ficheros[MAX_FICHEROS];	/* contenido de los capítulos */
