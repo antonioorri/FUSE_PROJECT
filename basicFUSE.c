@@ -15,7 +15,7 @@
 */
 #define FUSE_USE_VERSION 26
 
-#include "proyecto_lib.h"
+#include "basicFUSE_lib.h"
 
 #include <stdlib.h>
 #include <fuse.h>
@@ -73,9 +73,7 @@ static int mi_getattr(const char *path, struct stat *stbuf)
 		stbuf->st_size = 512;
 		stbuf->st_blocks = stbuf->st_size/512 + (stbuf->st_size%512)? 1 : 0;
 
-	} else {
-		res = -ENOENT;
-	}
+	} 
 
 	return res;
 }
