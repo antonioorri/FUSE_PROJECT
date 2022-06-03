@@ -7,7 +7,7 @@ basicFUSE : basicFUSE.o basicFUSE_lib.o
 	gcc -g -o $@  $^ ${fuse_flags}
 	mkdir -p $(montaje)
 	
-basicFUSE.o : basicFUSE.c basicFUSE_lib.h
+basicFUSE.o : basicFUSE2.c basicFUSE_lib.h
 	gcc -g -c -o $@  $< ${fuse_flags}
 
 basicFUSE_lib.o : basicFUSE_lib.c basicFUSE_lib.h
@@ -15,8 +15,7 @@ basicFUSE_lib.o : basicFUSE_lib.c basicFUSE_lib.h
 
 
 mount: basicFUSE
-	./basicFUSE $(fichero) $(montaje)
-
+	./basicFUSE  $(montaje)
 debug: basicFUSE
 	./basicFUSE -d $(fichero) $(montaje)
 
