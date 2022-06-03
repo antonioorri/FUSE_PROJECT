@@ -8,6 +8,7 @@
 
 int main(){
 	//estructura  anal_format
+	
 	char datos[8]={'a','n','a','l','.','j','u'};
 	FILE *f;
 	
@@ -32,6 +33,11 @@ int main(){
 	}
 	//---------------------------------------------
 	//estructura file info
+	
+	for(int i = 0; i<40000;i++){
+		fwrite("",sizeof(char),1,f);
+		//printf("%d\n",i);
+	}
 	
 	fclose(f);
 	return 0;
