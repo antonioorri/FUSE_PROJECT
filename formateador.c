@@ -2,13 +2,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "basicFUSE_lib.h"
 
 
 
 
 int main(){
-	
+	//estructura  anal_format
 	char datos[8]={'a','n','a','l','.','j','u'};
 	FILE *f;
 	
@@ -22,9 +21,17 @@ int main(){
 	}
 	//bytes per sector 512 en nuestro caso.
 	
-	uint16_t a;
+	int bytes_sector = 512 ;
+	int reserved_sectors=2;
+	fwrite(&bytes_sector,sizeof(int),1,f);
 	
-	
+	fwrite(&reserved_sectors,sizeof(int),1,f);
+	for(int i = 0; i<496;i++){
+		fwrite("",sizeof(char),1,f);
+		//printf("%d\n",i);
+	}
+	//---------------------------------------------
+	//estructura file info
 	
 	fclose(f);
 	return 0;
