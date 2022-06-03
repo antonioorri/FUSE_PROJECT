@@ -18,25 +18,6 @@
 #include <stdio.h>
 #include <string.h>
 
-int crear_fichero(const char *path,const char *nombre, struct structura_mis_datos *mis_datos){
-	struct stat fileStat;
-	FILE *f = fopen(nombre, "w+");
-	//if(strlen(nombre)>MAX_NOMBRE) return -EACCES;
-
-	strcpy(mis_datos->nombre_ficheros[mis_datos->numero_ficheros], nombre);
-	mis_datos->numero_ficheros++;
-	
-	fstat(fileno(f), &fileStat);
-	mis_datos->st_uid= fileStat.st_uid;
-	mis_datos->st_gid= fileStat.st_gid;
-	mis_datos->st_atime = fileStat.st_atime;
-	mis_datos->st_ctime = fileStat.st_ctime;
-	mis_datos->st_mtime = fileStat.st_mtime;
-	
-	fclose(f);
-	return 0;
-	
-}
 /***********************************
  * Busca un fichero path en mi estructura de datos
  * */
@@ -101,6 +82,46 @@ void leer_fichero(struct structura_mis_datos *mis_datos)
 	mis_datos->st_mtime = fileStat.st_mtime;
 
 	fclose(f);
+}
+
+/*
+int crear_fichero(const char *path,const char *nombre, struct structura_mis_datos *mis_datos){
+	/*struct stat fileStat;
+	FILE *f = fopen(nombre, "w+");
+	//if(strlen(nombre)>MAX_NOMBRE) return -EACCES;
+
+	strcpy(mis_datos->nombre_ficheros[mis_datos->numero_ficheros], nombre);
+	mis_datos->numero_ficheros++;
+	
+	fstat(fileno(f), &fileStat);
+	mis_datos->st_uid= fileStat.st_uid;
+	mis_datos->st_gid= fileStat.st_gid;
+	mis_datos->st_atime = fileStat.st_atime;
+	mis_datos->st_ctime = fileStat.st_ctime;
+	mis_datos->st_mtime = fileStat.st_mtime;
+	
+	fclose(f);
+	return 0;
+	
+}*/
+
+int crear_f(const char *nombre, struct structura_mis_datos *mis_datos){
+	struct stat fileStat;
+	FILE *f = fopen(nombre, "w+");
+	//if(strlen(nombre)>MAX_NOMBRE) return -EACCES;
+
+	strcpy(mis_datos->nombre_ficheros[mis_datos->numero_ficheros+1], nombre);
+	mis_datos->numero_ficheros++;
+	
+	fstat(fileno(f), &fileStat);
+	mis_datos->st_uid= fileStat.st_uid;
+	mis_datos->st_gid= fileStat.st_gid;
+	mis_datos->st_atime = fileStat.st_atime;
+	mis_datos->st_ctime = fileStat.st_ctime;
+	mis_datos->st_mtime = fileStat.st_mtime;
+	
+	fclose(f);
+	return 0;
 }
 
 

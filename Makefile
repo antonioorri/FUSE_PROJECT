@@ -1,5 +1,5 @@
 montaje= punto_montaje
-fichero= proverbiosycantares.txt
+fichero= es.txt
 
 fuse_flags= -D_FILE_OFFSET_BITS=64 -lfuse -pthread
 

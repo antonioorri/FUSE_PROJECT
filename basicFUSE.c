@@ -31,11 +31,37 @@
  *
  * */
 
-static const char* cuerdas_path = "/cuerda";
-static const char* viento_path = "/viento";
 
 /***********************************
  * */
+ 
+ 
+ 
+ 
+static void *mi_init(struct fuse_conn_info *conn){
+	struct structura_mis_datos *mis_datos= (struct structura_mis_datos *) fuse_get_context()->private_data;
+	mis_datos->af = (struct struct anal_format*)malloc(sizeof(struct anal_format));
+	
+	
+	//leemos el formato de nuestro file system. que se encuentra en el primer sector.
+	pread(mis_datos->fh,(void*) mis_datos->af,sizeof(struct anal_format),0);
+	
+	mis_datos->finfo = (struct struct file_inf*)malloc(sizeof(struct file_inf));
+	//leemos la estructura que nos da información de los archivos. En nuestro caso se encuentra en el sector 1.(reservado)
+	pread(mis_datos->fh,(void*) mis_datos->file_inf,sizeof(struct file_inf),mis_dato->af->bytes_sector);
+	
+	mis_datos->mi_offset = (mis_datos->af->bytes_sector * mis_datos->af->reserved_sectors);// aquí empezaremos a escribir.
+	
+	mis_datos->st_uid = getuid(); // The owner of the file/directory is the user who mounted the filesystem
+    mis_datos->st_gid = getgid(); // The group of the file/directory is the same as the group of the user who mounted the filesystem
+    mis_datos->st_atime = time( NULL ); // The last "a"ccess of the file/directory is right now
+    mis_datos->st_mtime = time( NULL ); // The last "m"odification of the file/directory is right now
+    mis_datos->st_ctime = time( NULL ); // The last "m"odification of the file/directory is right now
+    
+    return mis_datos;
+} 
+ 
+
 static int mi_getattr(const char *path, struct stat *stbuf)
 {
 	/* completar */
@@ -46,17 +72,20 @@ static int mi_getattr(const char *path, struct stat *stbuf)
 	int res = 0;
 
 	memset(stbuf, 0, sizeof(struct stat));
+	
 	if (strcmp(path, "/") == 0) {
-		stbuf->st_mode = S_IFDIR | 0777;
+		stbuf->st_mode = S_IFDIR | 0755;
 		stbuf->st_nlink = 2;
+		stbuf-> st_size = 512;
+		stbuf->st_blocks = 8;
+		
+		
 		stbuf->st_uid = mis_datos->st_uid;
 		stbuf->st_gid = mis_datos->st_gid;
-
 		stbuf->st_atime = mis_datos->st_atime; //mod time
 		stbuf->st_mtime = mis_datos->st_mtime;
 		stbuf->st_ctime = mis_datos->st_ctime;
-		stbuf->st_size = 4096; //tamaño (4096) pret 1024
-		stbuf->st_blocks = 8; //tamaño dividido entre 512 //8 anterior 2
+		 //tamaño dividido entre 512 //8 anterior 2
 		//aqui se controlan los directorios nuevos
 
 	} else {
@@ -95,11 +124,11 @@ struct structura_mis_datos *mis_datos= (struct structura_mis_datos *) fuse_get_c
   if (strcmp(path, "/") == 0) {
         if (filler(buf, ".", NULL, 0) != 0) return -ENOMEM;
         if (filler(buf, "..", NULL, 0) != 0) return -ENOMEM;
-
+		/*
         for (i = 0; i < mis_datos->numero_ficheros; i++) {
             if (filler(buf, mis_datos->nombre_ficheros[i], NULL, 0) != 0) return -ENOMEM;
         }
-
+*/
       }else
         return -ENOMEM;
 
@@ -109,6 +138,8 @@ struct structura_mis_datos *mis_datos= (struct structura_mis_datos *) fuse_get_c
 
 /***********************************
  * */
+ 
+/*
 static int mi_open(const char *path, struct fuse_file_info *fi)
 {
 	 int i;
@@ -122,16 +153,15 @@ static int mi_open(const char *path, struct fuse_file_info *fi)
         fi->fh=i;
         return 0;
     }else{
-		if(crear_fichero(path, path+1, mis_datos)) return -EACCES;
+		crear_f(path, mis_datos);
 		fi->fh=mis_datos->numero_ficheros;
 	}
 	return 0;
 
 }
 
-
-/***********************************
- * */
+*/
+/*
 static int mi_read(const char *path, char *buf, size_t size, off_t offset,
 		      struct fuse_file_info *fi)
 {
@@ -146,19 +176,20 @@ static int mi_read(const char *path, char *buf, size_t size, off_t offset,
         memcpy(buf, mis_datos->contenido_ficheros[i] + offset, size);
     } else
         size = 0;
-
     return size;
 }
-
+*/
 
 /***********************************
  * operaciones FUSE
  * */
 static struct fuse_operations basic_oper = {
+	.init		= mi_init,
 	.getattr	= mi_getattr,
 	.readdir	= mi_readdir,
-	.open		= mi_open,
-	.read		= mi_read,
+	//.open		= mi_open,
+	//.read		= mi_read,
+	//.mknod		= mi_mknod,
 };
 
 
@@ -172,22 +203,14 @@ int main(int argc, char *argv[])
 
 	// análisis parámetros de entrada
 	if ((argc < 3) || (argv[argc-2][0] == '-') || (argv[argc-1][0] == '-')) error_parametros();
-
-	mis_datos->fichero_inicial = strdup(argv[argc-2]); // fichero donde están los capítulos
-    argv[argc-2] = argv[argc-1];
+    mis_datos -> fichero_imagen = strup(argv[argc-2]);
+    mis_datos->fh=open(mis_datos->fichero_imagen, O_RDONLY);
+	if(mis_datos->fh<0){
+		perror("ERROR al abrir el acrchivo");
+		exit(-1);
+	}
+	argv[argc-2] = argv[argc-1];
     argv[argc-1] = NULL;
     argc--;
-
-    leer_fichero(mis_datos);
-
-/*    int i;
-    for(i=0; i<mis_datos->numero_ficheros; i++)
-    {
-		printf("----->  %s\n", mis_datos->nombre_ficheros[i]);
-		printf("%s",mis_datos->contenido_ficheros[i]);
-	}
-	exit(0);
-*/
-
 	return fuse_main(argc, argv, &basic_oper, mis_datos);
 }
