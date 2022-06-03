@@ -50,8 +50,22 @@ typedef struct anal_format {
 typedef struct file_inf{
 	char nombre[10];//nombre del archivo.
 	char format[3];//formato del archivo.
+	int id;
 	uint32_t size;//tamaño del archivo
+	uint8_t atributos;
+	/*
+      Attribute Bits:
+      0:    read only
+      1:    hidden      -   Shouldn't show in Dir listing
+      2:    system      -   Belongs to system, shouldn't be moved
+      3:    volume id   -   Filename is volume label
+      4:    directory   -   Is a Subdirectory
+      5:    archive     -   Has been changed since last backup, ignore
+      6-7:  unused, should be 0
+    */
 };
+
+
 typedef struct structura_mis_datos
 {
 	char *fichero_imagen;  				/* fichero formato analju */

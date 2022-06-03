@@ -24,6 +24,7 @@
 #include <errno.h>
 #include <fcntl.h>
 
+
 /*
  *  Para usar los datos pasados a FUSE usar en las funciones:
  *
@@ -124,11 +125,11 @@ struct structura_mis_datos *mis_datos= (struct structura_mis_datos *) fuse_get_c
   if (strcmp(path, "/") == 0) {
         if (filler(buf, ".", NULL, 0) != 0) return -ENOMEM;
         if (filler(buf, "..", NULL, 0) != 0) return -ENOMEM;
-		/*
+		
         for (i = 0; i < mis_datos->numero_ficheros; i++) {
-            if (filler(buf, mis_datos->nombre_ficheros[i], NULL, 0) != 0) return -ENOMEM;
+            if (filler(buf, mis_datos->file_inf[i+2]->nombre, NULL, 0) != 0) return -ENOMEM;
         }
-*/
+
       }else
         return -ENOMEM;
 
@@ -136,49 +137,19 @@ struct structura_mis_datos *mis_datos= (struct structura_mis_datos *) fuse_get_c
 
 }
 
-/***********************************
- * */
- 
-/*
-static int mi_open(const char *path, struct fuse_file_info *fi)
-{
-	 int i;
-
-    struct structura_mis_datos* mis_datos = (struct structura_mis_datos*)fuse_get_context()->private_data; //usarla para acceder a la estructura
-
-
-    if ((i=buscar_fichero(path , mis_datos)) >= 0) //=
-    {
-        //if ((fi->flags & 3) != O_RDONLY) return -EACCES;
-        fi->fh=i;
-        return 0;
-    }else{
-		crear_f(path, mis_datos);
-		fi->fh=mis_datos->numero_ficheros;
-	}
-	return 0;
-
+static int mi_mknod(const char *path,mode_t mode, dev_t rdev){
+	
+	struct structura_mis_datos *mis_datos= (struct structura_mis_datos *) fuse_get_context()->private_data;
+	mis_datos->finfo = (struct struct file_inf*)malloc(sizeof(struct file_inf));
+	path++;//para quitar el /
+	
+	mis_datos->numero_ficheros++;
+	mis_datos->mi_offset++;
+	memcpy(finfo->nombre,path,strlen(path);
+	finfo->id=numero_ficheros;
+	
 }
 
-*/
-/*
-static int mi_read(const char *path, char *buf, size_t size, off_t offset,
-		      struct fuse_file_info *fi)
-{
- size_t len;
-    int i = fi->fh;
-    struct structura_mis_datos* mis_datos = (struct structura_mis_datos*)fuse_get_context()->private_data; //usarla para acceder a la estructura
-
-    len = strlen(mis_datos->contenido_ficheros[i]);
-
-    if (offset < len) {
-        if (offset + size > len) size = len - offset;
-        memcpy(buf, mis_datos->contenido_ficheros[i] + offset, size);
-    } else
-        size = 0;
-    return size;
-}
-*/
 
 /***********************************
  * operaciones FUSE
