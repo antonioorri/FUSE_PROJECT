@@ -1,0 +1,8 @@
+make --dry-run --always-make --keep-going --print-directory
+make: Entering directory '/home/antonio/projects/FUSE_PROJECT'
+gcc -g -c -o basicFUSE.o  basicFUSE.c -D_FILE_OFFSET_BITS=64 -lfuse -pthread
+gcc -g -c -o basicFUSE_lib.o  basicFUSE_lib.c
+gcc -g -o basicFUSE  basicFUSE.o basicFUSE_lib.o -D_FILE_OFFSET_BITS=64 -lfuse -pthread
+mkdir -p punto_montaje
+make: Leaving directory '/home/antonio/projects/FUSE_PROJECT'
+ 

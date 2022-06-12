@@ -1,7 +1,0 @@
-Creación de un fichero vacío de 50 megas:
-
-dd if=/dev/zero of=myfs count=100000
-
-
-
-hexdump -C myfs |less
