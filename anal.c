@@ -6,7 +6,7 @@ Grupo C
 Proyecto hecho por: Álvaro, Antonio y Juan
 Team pichasgordas
 
-Versión 0.5 ❤️😒😊😭😩😍😔😁💕💕💕💕😊😊😊😊
+Versión 0.6 ❤️😒😊😭😩😍😔😁💕💕💕💕😊😊😊😊
 
  */
 
@@ -274,6 +274,38 @@ int mi_fgetattr(const char *path, struct stat *statbuf, struct fuse_file_info *f
     return retstat;
 }
 
+int mi_rmdir(const char *path)
+{
+    int retstat = 0;
+    char fpath[PATH_MAX];
+    
+    log_msg("mi_rmdir(path=\"%s\")\n",
+	    path);
+    mi_fullpath(fpath, path);
+    
+    retstat = rmdir(fpath);
+    if (retstat < 0)
+	retstat = mi_error("mi_rmdir rmdir");
+    
+    return retstat;
+}
+
+int mi_chmod(const char *path, mode_t mode)
+{
+    int retstat = 0;
+    char fpath[PATH_MAX];
+    
+    log_msg("\nmi_chmod(fpath=\"%s\", mode=0%03o)\n",
+	    path, mode);
+    mi_fullpath(fpath, path);
+    
+    retstat = chmod(fpath, mode);
+    if (retstat < 0)
+	retstat = mi_error("mi_chmod chmod");
+    
+    return retstat;
+}
+
 struct fuse_operations mi_oper = {
   .getattr = mi_getattr,
   .getdir = NULL,
@@ -288,6 +320,8 @@ struct fuse_operations mi_oper = {
   .access = mi_access,
   .create = mi_create,
   .fgetattr = mi_fgetattr
+  .rmdir = mi_rmdir
+  .chmod = mi_chmod
 };
 
 void mi_usage()

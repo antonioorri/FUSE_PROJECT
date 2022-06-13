@@ -4,7 +4,7 @@ Grupo C
 Proyecto hecho por: Álvaro, Antonio y Juan
 Team pichasgordas
 
-Versión 0.5 ❤️😒😊😭😩😍😔😁💕💕💕💕😊😊😊😊fdsafdsa
+Versión 0.6 ❤️😒😊😭😩😍😔😁💕💕💕💕😊😊😊😊fdsafdsa
 
  */
 #ifndef _FUSE_H_
