@@ -1,3 +1,15 @@
+/*
+DSO 2022
+Grupo C
+
+Hecho por Aĺvaro, Antonio y Juan
+Team pichasgordas
+
+Version 1.0 ❤️😒😊😭😩😍😔😁💕💕💕💕😊😊😊😊
+
+
+gcc FS.c -o FS pkg-config fuse --cflags --libs
+*/
 #define FUSE_USE_VERSION 30
 
 #include <fuse.h>
