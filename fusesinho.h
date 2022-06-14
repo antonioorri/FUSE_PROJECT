@@ -12,11 +12,11 @@
 
 #define block_size 1024
 
-typedef struct superblock {
+typedef struct superbloque {
 	char datablocks[block_size*100];		//total number of data blocks
 	char data_bitmap[105];      			//array of data block numbers that are available
 	char inode_bitmap[105];   				//array of inode numbers that are available
-} superblock;
+} superbloque;
 
 typedef struct inode {
 	int datablocks[16];            //data block number that the inode points to

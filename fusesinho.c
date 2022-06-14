@@ -5,7 +5,7 @@ Grupo C
 Hecho por Aĺvaro, Antonio y Juan
 Team pichasgordas
 
-Version 1.0 ❤️😒😊😭😩😍😔😁💕💕💕💕😊😊😊😊
+Version 1.0.1 ❤️😒😊😭😩😍😔😁💕💕💕💕😊😊😊😊
 
 
 gcc FS.c -o FS pkg-config fuse --cflags --libs
@@ -29,11 +29,11 @@ gcc FS.c -o FS pkg-config fuse --cflags --libs
 
 
 
-superblock spblock;
+superbloque spbloque;
 
-void initialize_superblock(){
-	memset(spblock.data_bitmap, '0', 100*sizeof(char));// bytes
-	memset(spblock.inode_bitmap, '0', 100*sizeof(char));//100 bytes
+void initialize_superbloque(){
+	memset(spbloque.data_bitmap, '0', 100*sizeof(char));// bytes
+	memset(spbloque.inode_bitmap, '0', 100*sizeof(char));//100 bytes
 }
 
 filetype * root;
@@ -107,7 +107,7 @@ int save_contents(){
 	FILE * fd1 = fopen("super.bin", "wb");
 
 	fwrite(file_array, sizeof(filetype)*31, 1, fd);
-	fwrite(&spblock,sizeof(superblock),1,fd1);
+	fwrite(&spbloque,sizeof(superbloque),1,fd1);
 
 	fclose(fd);
 	fclose(fd1);
@@ -117,7 +117,7 @@ int save_contents(){
 
 void initialize_root_directory() {
 
-	spblock.inode_bitmap[1]=1; //marking it with 0
+	spbloque.inode_bitmap[1]=1; //marking it with 0
 	root = (filetype *) malloc (sizeof(filetype));
 
 	strcpy(root->path, "/");
@@ -218,8 +218,8 @@ filetype * filetype_from_path(char * path){
 
 int find_free_inode(){
 	for (int i = 2; i < 100; i++){
-		if(spblock.inode_bitmap[i] == '0'){
-			spblock.inode_bitmap[i] = '1';
+		if(spbloque.inode_bitmap[i] == '0'){
+			spbloque.inode_bitmap[i] = '1';
 		}
 		return i;
 	}
@@ -227,8 +227,8 @@ int find_free_inode(){
 
 int find_free_db(){
 	for (int i = 1; i < 100; i++){
-		if(spblock.inode_bitmap[i] == '0'){
-			spblock.inode_bitmap[i] = '1';
+		if(spbloque.inode_bitmap[i] == '0'){
+			spbloque.inode_bitmap[i] = '1';
 		}
 		return i;
 	}
@@ -557,12 +557,12 @@ int myread(const char *path, char *buf, size_t size, off_t offset,struct fuse_fi
 		strcpy(str, "");
 		int i;
 		for(i = 0; i < (file -> blocks) - 1; i++){
-			strncat(str, &spblock.datablocks[block_size*(file -> datablocks[i])], 1024);
+			strncat(str, &spbloque.datablocks[block_size*(file -> datablocks[i])], 1024);
 			printf("--> %s", str);
 		}
-		strncat(str, &spblock.datablocks[block_size*(file -> datablocks[i])], (file -> size)%1024);
+		strncat(str, &spbloque.datablocks[block_size*(file -> datablocks[i])], (file -> size)%1024);
 		printf("--> %s", str);
-		//strncpy(str, &spblock.datablocks[block_size*(file -> datablocks[0])], file->size);
+		//strncpy(str, &spbloque.datablocks[block_size*(file -> datablocks[0])], file->size);
 		strcpy(buf, str);
 	}
 	return file->size;
@@ -628,7 +628,7 @@ int mywrite(const char *path, const char *buf, size_t size, off_t offset, struct
 	int indexno = (file->blocks)-1;
 
 	if(file -> size == 0){
-		strcpy(&spblock.datablocks[block_size*((file -> datablocks)[0])], buf);
+		strcpy(&spbloque.datablocks[block_size*((file -> datablocks)[0])], buf);
 		file -> size = strlen(buf);
 		(file -> blocks)++;
 	}
@@ -636,18 +636,18 @@ int mywrite(const char *path, const char *buf, size_t size, off_t offset, struct
 		int currblk = (file->blocks)-1;
 		int len1 = 1024 - (file -> size % 1024);
 		if(len1 >= strlen(buf)){
-			strcat(&spblock.datablocks[block_size*((file -> datablocks)[currblk])], buf);
+			strcat(&spbloque.datablocks[block_size*((file -> datablocks)[currblk])], buf);
 			file -> size += strlen(buf);
-			printf("---> %s\n", &spblock.datablocks[block_size*((file -> datablocks)[currblk])]);
+			printf("---> %s\n", &spbloque.datablocks[block_size*((file -> datablocks)[currblk])]);
 		}
 		else{
 			char * cpystr = malloc(1024*sizeof(char));
 			strncpy(cpystr, buf, len1-1);
-			strcat(&spblock.datablocks[block_size*((file -> datablocks)[currblk])], cpystr);
+			strcat(&spbloque.datablocks[block_size*((file -> datablocks)[currblk])], cpystr);
 			strcpy(cpystr, buf);
-			strcpy(&spblock.datablocks[block_size*((file -> datablocks)[currblk+1])], (cpystr+len1-1));
+			strcpy(&spbloque.datablocks[block_size*((file -> datablocks)[currblk+1])], (cpystr+len1-1));
 			file -> size += strlen(buf);
-			printf("---> %s\n", &spblock.datablocks[block_size*((file -> datablocks)[currblk])]);
+			printf("---> %s\n", &spbloque.datablocks[block_size*((file -> datablocks)[currblk])]);
 			(file -> blocks)++;
 		}
 
@@ -698,10 +698,10 @@ int main( int argc, char *argv[] ) {
 		root = &file_array[0];
 
 		FILE *fd1 = fopen("super.bin", "rb");
-		fread(&spblock,sizeof(superblock),1,fd1);
+		fread(&spbloque,sizeof(superbloque),1,fd1);
 	}
 	else{
-		initialize_superblock();
+		initialize_superbloque();
 		initialize_root_directory();
 	}
 
