@@ -5,7 +5,7 @@ Grupo C
 Hecho por Aĺvaro, Antonio y Juan
 Team pichasgordas
 
-Version 1.0.1 ❤️😒😊😭😩😍😔😁💕💕💕💕😊😊😊😊
+Version 1.1 ❤️😒😊😭😩😍😔😁💕💕💕💕😊😊😊😊
 
 
 gcc FS.c -o FS pkg-config fuse --cflags --libs
@@ -98,7 +98,7 @@ int save_contents(){
 	int index = 0;
 	tree_to_array(queue, &front, &rear, &index);
 
-	for(int i = 0; i < 31; i++){
+	for(int i = 0; i < strlen(spbloque.inode_bitmap); i++){
 		printf("%d", file_array[i].valid);
 	}
 
@@ -109,7 +109,7 @@ int save_contents(){
 	fwrite(file_array, sizeof(filetype)*31, 1, fd);
 	fwrite(&spbloque,sizeof(superbloque),1,fd1);
 
-	fclose(fd);
+	fclose(fd); 
 	fclose(fd1);
 
 	printf("\n");
@@ -216,21 +216,34 @@ filetype * filetype_from_path(char * path){
 
 }
 
+void inodos_libres(){
+	for(int  i = 2; i < strlen(spbloque.inode_bitmap); i++)
+		printf("%c ",spbloque.inode_bitmap[i]);
+	printf("\n");
+}
+
+
 int find_free_inode(){
-	for (int i = 2; i < 100; i++){
+	int i;
+	
+	inodos_libres();
+	for ( i = 2; i < strlen(spbloque.inode_bitmap) ; i++){
 		if(spbloque.inode_bitmap[i] == '0'){
 			spbloque.inode_bitmap[i] = '1';
+			return i;
 		}
-		return i;
+
 	}
+	return i;//da error. pero ahora cuando borremos el archivo hay que poner el inodo a '0'
 }
 
 int find_free_db(){
-	for (int i = 1; i < 100; i++){
+	for (int i = 1; i <strlen(spbloque.inode_bitmap); i++){
 		if(spbloque.inode_bitmap[i] == '0'){
 			spbloque.inode_bitmap[i] = '1';
+			return i;
 		}
-		return i;
+		
 	}
 }
 
@@ -244,41 +257,42 @@ void add_child(filetype * parent, filetype * child){
 
 static int mymkdir(const char *path, mode_t mode) {//Para crear carpetas
 	printf("My mkdir\n");
-
+	printf("Buscamos un inodo libre\n");
 	int index = find_free_inode();//buscamos un inodo libre.
-
+	printf("el inodo que estaba libre es: %d\n",index);
 	
 
-	filetype * new_folder = malloc(sizeof(filetype));
 
-	char * pathname = malloc(strlen(path)+2);
-	strcpy(pathname, path);
+	filetype * new_folder = malloc(sizeof(filetype));//para el nuevo directorio
 
-	char * rindex = strrchr(pathname, '/');
-
+	char * pathname = malloc(strlen(path));
+	
+	strcpy(pathname, path);//path de la carpeta creada
+	printf("path: %s\n",pathname);
+	char * rindex = strrchr(pathname, '/');// /antonio ,antnonio //antonio
+	printf("nombre del fichero: %s\n",rindex+1);
 	//new_folder -> name = malloc(strlen(pathname)+2);
 	strcpy(new_folder -> name, rindex+1);
 	//new_folder -> path = malloc(strlen(pathname)+2);
-	strcpy(new_folder -> path, pathname);
-
-
-
+	strcpy(new_folder -> path, pathname);// /antonio/alnberjfkdsañ/ hola.c
+	
 	*rindex = '\0';
 
-	if(strlen(pathname) == 0)
-	strcpy(pathname, "/");
+	if(strlen(pathname) == 0){
+		printf("Cuando entro aqui? cuando estamos en / \n");
+		strcpy(pathname, "/");
+	}
+		
 
 	new_folder -> children = NULL;
 	new_folder -> num_children = 0;
 	new_folder -> parent = filetype_from_path(pathname);
-	new_folder -> num_links = 2;
+	new_folder -> num_links = 2;// . ..
 	new_folder -> valid = 1;
 	strcpy(new_folder -> test, "test");
 
-	if(new_folder -> parent == NULL)
+	if(new_folder -> parent == NULL)//si no tiene padre error porque tiene que tener si o si
 		return -ENOENT;
-
-	//printf(";;;;%p;;;;\n", new_folder);
 
 	add_child(new_folder->parent, new_folder);
 
@@ -290,7 +304,7 @@ static int mymkdir(const char *path, mode_t mode) {//Para crear carpetas
 	new_folder->m_time = time(NULL);
 	new_folder->b_time = time(NULL);
 
-	new_folder -> permissions = S_IFDIR | 0777;
+	new_folder -> permissions = S_IFDIR | 0755;
 
 	new_folder -> size = 0;
 	new_folder->group_id = getgid();
@@ -676,34 +690,10 @@ static struct fuse_operations operations =
 };
 
 int main( int argc, char *argv[] ) {
-	FILE *fd = fopen("file_structure.bin", "rb");
-	if(fd){
-	printf("LOADING\n");
-	fread(&file_array, sizeof(filetype)*31, 1, fd);
-
-	int child_startindex = 1;
-	file_array[0].parent = NULL;
-
-	for(int i = 0; i < 6; i++){
-		file_array[i].num_children = 0;
-		file_array[i].children = NULL;
-		for(int j = child_startindex; j < child_startindex + 5; j++){
-			if(file_array[j].valid){
-				add_child(&file_array[i], &file_array[j]);
-			}
-		}
-		child_startindex += 5;
-	}
-
-		root = &file_array[0];
-
-		FILE *fd1 = fopen("super.bin", "rb");
-		fread(&spbloque,sizeof(superbloque),1,fd1);
-	}
-	else{
+	
 		initialize_superbloque();
 		initialize_root_directory();
-	}
+
 
 	return fuse_main(argc, argv, &operations, NULL);
 }
