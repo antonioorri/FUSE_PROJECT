@@ -5,8 +5,8 @@ Grupo C
 Hecho por Aĺvaro, Antonio y Juan
 Team pichasgordas
 
-Version 1.1 ❤️😒😊😭😩😍😔😁💕💕💕💕😊😊😊😊
-
+Version 1.1.1 ❤️😒😊😭😩😍😔😁💕💕💕💕😊😊😊😊
+😍😍😍😍😍😍😍😍😍😍😍😍😍😍😍😍😍😍😍😍😍😍😍😍😍😍😍😍
 
 gcc FS.c -o FS pkg-config fuse --cflags --libs
 */
@@ -35,94 +35,14 @@ void initialize_superbloque(){
 	memset(spbloque.data_bitmap, '0', 100*sizeof(char));// bytes
 	memset(spbloque.inode_bitmap, '0', 100*sizeof(char));//100 bytes
 }
-
 filetype * root;
-
 filetype file_array[50];
 
-void tree_to_array(filetype * queue, int * front, int * rear, int * index){
-
-	if(rear < front)
-		return;
-	if(*index > 30)
-		return;
-
-
-	filetype curr_node = queue[*front];
-	*front += 1;
-	file_array[*index] = curr_node;
-	*index += 1;
-
-	if(*index < 6){
-
-		if(curr_node.valid){
-			int n = 0;
-			int i;
-			for(i = 0; i < curr_node.num_children; i++){
-				if(*rear < *front)
-					*rear = *front;
-				queue[*rear] = *(curr_node.children[i]);
-				*rear += 1;
-			}
-			while(i<5){
-				filetype waste_node;
-				waste_node.valid = 0;
-				queue[*rear] = waste_node;
-				*rear += 1;
-				i++;
-			}
-		}
-		else{
-			int i = 0;
-			while(i<5){
-				filetype waste_node;
-				waste_node.valid = 0;
-				queue[*rear] = waste_node;
-				*rear += 1;
-				i++;
-			}
-		}
-	}
-
-	tree_to_array(queue, front, rear, index);
-
-}
-
-
-int save_contents(){
-	printf("SAVING\n");
-	filetype * queue = malloc(sizeof(filetype)*60);
-	int front = 0;
-	int rear = 0;
-	queue[0] = *root;
-	int index = 0;
-	tree_to_array(queue, &front, &rear, &index);
-
-	for(int i = 0; i < strlen(spbloque.inode_bitmap); i++){
-		printf("%d", file_array[i].valid);
-	}
-
-	FILE * fd = fopen("file_structure.bin", "wb");
-
-	FILE * fd1 = fopen("super.bin", "wb");
-
-	fwrite(file_array, sizeof(filetype)*31, 1, fd);
-	fwrite(&spbloque,sizeof(superbloque),1,fd1);
-
-	fclose(fd); 
-	fclose(fd1);
-
-	printf("\n");
-}
-
 void initialize_root_directory() {
-
 	spbloque.inode_bitmap[1]=1; //marking it with 0
 	root = (filetype *) malloc (sizeof(filetype));
-
 	strcpy(root->path, "/");
 	strcpy(root->name, "/");
-
 	root -> children = NULL;
 	root -> num_children = 0;
 	root -> parent = NULL;
@@ -148,13 +68,13 @@ void initialize_root_directory() {
 	//root -> size = 0;
 	root -> blocks = 0;
 
-	save_contents();
 }
 
 
 
 
 filetype * filetype_from_path(char * path){
+	
 	char curr_folder[100];
 	char * path_name = malloc(strlen(path) + 2);
 
@@ -168,7 +88,7 @@ filetype * filetype_from_path(char * path){
 		return curr_node;
 
 	if(path_name[0] != '/'){
-		printf("INCORRECT PATH\n");
+		printf("Path incorrecto\n");
 		exit(1);
 	}
 	else{
@@ -184,8 +104,10 @@ filetype * filetype_from_path(char * path){
 
 	while(strlen(path_name) != 0){
 		index = strchr(path_name, '/');
+		printf("%s---\n",index);
 		
 		if(index != NULL){
+			printf("index distinto de null\n");
 			strncpy(curr_folder, path_name, index - path_name);
 			curr_folder[index-path_name] = '\0';
 			
@@ -221,7 +143,6 @@ void inodos_libres(){
 		printf("%c ",spbloque.inode_bitmap[i]);
 	printf("\n");
 }
-
 
 int find_free_inode(){
 	int i;
@@ -275,48 +196,34 @@ static int mymkdir(const char *path, mode_t mode) {//Para crear carpetas
 	strcpy(new_folder -> name, rindex+1);
 	//new_folder -> path = malloc(strlen(pathname)+2);
 	strcpy(new_folder -> path, pathname);// /antonio/alnberjfkdsañ/ hola.c
-	
 	*rindex = '\0';
-
 	if(strlen(pathname) == 0){
-		printf("Cuando entro aqui? cuando estamos en / \n");
+		//printf("Cuando entro aqui? cuando estamos en / \n");
 		strcpy(pathname, "/");
 	}
-		
 
+	//--------------------------------------------------------------------------------------//
 	new_folder -> children = NULL;
 	new_folder -> num_children = 0;
 	new_folder -> parent = filetype_from_path(pathname);
 	new_folder -> num_links = 2;// . ..
 	new_folder -> valid = 1;
 	strcpy(new_folder -> test, "test");
-
 	if(new_folder -> parent == NULL)//si no tiene padre error porque tiene que tener si o si
 		return -ENOENT;
-
 	add_child(new_folder->parent, new_folder);
-
-	//new_folder -> type = malloc(10);
 	strcpy(new_folder -> type, "directory");
-
 	new_folder->c_time = time(NULL);
 	new_folder->a_time = time(NULL);
 	new_folder->m_time = time(NULL);
 	new_folder->b_time = time(NULL);
-
 	new_folder -> permissions = S_IFDIR | 0755;
-
 	new_folder -> size = 0;
 	new_folder->group_id = getgid();
 	new_folder->user_id = getuid();
-
-
 	new_folder -> number = index;
 	new_folder -> blocks = 0;
-
-
-	save_contents();
-
+	//--------------------------------------------------------------------------------------//
 	return 0;
 
 }
@@ -325,21 +232,21 @@ static int mymkdir(const char *path, mode_t mode) {//Para crear carpetas
 int myreaddir(const char *path, void *buffer, fuse_fill_dir_t filler, off_t offset, struct fuse_file_info *fi ){
 	printf("READDIR\n");
 
-	filler(buffer, ".", NULL, 0 );
-	filler(buffer, "..", NULL, 0 );
+	filler(buffer, ".", NULL, 0 ); 
+	filler(buffer, "..", NULL, 0 ); 
 
-	char * pathname = malloc(strlen(path)+2);
+	char * pathname = malloc(strlen(path)+2); 
 	strcpy(pathname, path);
 
-	filetype * dir_node = filetype_from_path(pathname);
+	filetype * dir_node = filetype_from_path(pathname); // busca el nodo en el path
 
 	if(dir_node == NULL){
 		return -ENOENT;
 	}
 	else{
-		dir_node->a_time=time(NULL);
-		for(int i = 0; i < dir_node->num_children; i++){
-			printf(":%s:\n", dir_node->children[i]->name);
+		dir_node->a_time=time(NULL); 
+		for(int i = 0; i < dir_node->num_children; i++){ // asigna el nodo del directorio hacia el hijo
+			printf(":%s:\n", dir_node->children[i]->name); // indica el nodo al hijo
 			filler( buffer, dir_node->children[i]->name, NULL, 0 );
 		}
 	}
@@ -350,12 +257,9 @@ int myreaddir(const char *path, void *buffer, fuse_fill_dir_t filler, off_t offs
 
 static int mygetattr(const char *path, struct stat *statit) {
 	char *pathname;
-	pathname=(char *)malloc(strlen(path) + 2);
-
+	pathname=(char *)malloc(strlen(path));
 	strcpy(pathname, path);
-
 	printf("GETATTR %s\n", pathname);
-
 	filetype * file_node = filetype_from_path(pathname);
 	if(file_node == NULL)
 		return -ENOENT;
@@ -369,13 +273,13 @@ static int mygetattr(const char *path, struct stat *statit) {
 	statit->st_nlink = file_node -> num_links + file_node -> num_children;
 	statit->st_size = file_node -> size;
 	statit->st_blocks = file_node -> blocks;
-
 	return 0;
 }
 
 int myrmdir(const char * path){
-
+	printf("Se va a borrar un directorio. ;( espero que no fuera importante\n");
 	char * pathname = malloc(strlen(path)+2);
+	
 	strcpy(pathname, path);
 
 	char * rindex = strrchr(pathname, '/');
@@ -419,9 +323,6 @@ int myrmdir(const char * path){
 	else{
 		return -ENOENT;
 	}
-
-	save_contents();
-
 	return 0;
 
 }
@@ -473,29 +374,30 @@ int myrm(const char * path){
 		return -ENOENT;
 	}
 
-	save_contents();
-
 	return 0;
 
 }
 
 
 int mycreate(const char * path, mode_t mode, struct fuse_file_info *fi) {
-
 	printf("CREATEFILE\n");
+	printf("------------------Entramos en mycreate-------------------\n");
+//	printf("Vamos ha crear el archivo: ");
+	
+	int index = find_free_inode(); //Encuentro el inodo libre
 
-	int index = find_free_inode();
+	filetype * new_file = malloc(sizeof(filetype)); //Reservo espacio para un nuevo fichero 
 
-	filetype * new_file = malloc(sizeof(filetype));
-
-	char * pathname = malloc(strlen(path)+2);
+	char * pathname = malloc(strlen(path)+2); 
 	strcpy(pathname, path);
 
 	char * rindex = strrchr(pathname, '/');
+	printf("rindex = %c \n", rindex);
 
+	
 	strcpy(new_file -> name, rindex+1);
 	strcpy(new_file -> path, pathname);
-
+//	printf("%s\n",rindex+1);
 	*rindex = '\0';
 
 	if(strlen(pathname) == 0)
@@ -520,7 +422,7 @@ int mycreate(const char * path, mode_t mode, struct fuse_file_info *fi) {
 	new_file->m_time = time(NULL);
 	new_file->b_time = time(NULL);
 
-	new_file -> permissions = S_IFREG | 0777;
+	new_file -> permissions = S_IFREG | 0755;
 
 	new_file -> size = 0;
 	new_file->group_id = getgid();
@@ -532,12 +434,7 @@ int mycreate(const char * path, mode_t mode, struct fuse_file_info *fi) {
 	for(int i = 0; i < 16; i++){
 		(new_file -> datablocks)[i] = find_free_db();
 	}
-
-	//new_file -> size = 0;
 	new_file -> blocks = 0;
-
-	save_contents();
-
 	return 0;
 }
 
@@ -545,10 +442,10 @@ int mycreate(const char * path, mode_t mode, struct fuse_file_info *fi) {
 int myopen(const char *path, struct fuse_file_info *fi) {
 	printf("OPEN\n");
 
-	char * pathname = malloc(sizeof(path)+1);
-	strcpy(pathname, path);
+	char * pathname = malloc(sizeof(path)+1); // crea un char con el path
+	strcpy(pathname, path); // copia la ruta
 
-	filetype * file = filetype_from_path(pathname);
+	filetype * file = filetype_from_path(pathname); // coge el archivo
 
 	return 0;
 }
@@ -561,23 +458,23 @@ int myread(const char *path, char *buf, size_t size, off_t offset,struct fuse_fi
 	strcpy(pathname, path);
 
 	filetype * file = filetype_from_path(pathname);
-	if(file == NULL)
+	if(file == NULL)  // si el fichero es nulo, devuelve el error
 		return -ENOENT;
 
 	else{
-		char * str = malloc(sizeof(char)*1024*(file -> blocks));
+		char * str = malloc(sizeof(char)*1024*(file -> blocks)); // sino introduce el archivo en el bloque
 
 		printf(":%ld:\n", file->size);
 		strcpy(str, "");
 		int i;
-		for(i = 0; i < (file -> blocks) - 1; i++){
-			strncat(str, &spbloque.datablocks[block_size*(file -> datablocks[i])], 1024);
+		for(i = 0; i < (file -> blocks) - 1; i++){ // mete el fichero en el bloque
+			strncat(str, &spbloque.datablocks[block_size*(file -> datablocks[i])], 1024); // añade el bloque de memoria al otro
 			printf("--> %s", str);
 		}
-		strncat(str, &spbloque.datablocks[block_size*(file -> datablocks[i])], (file -> size)%1024);
+		strncat(str, &spbloque.datablocks[block_size*(file -> datablocks[i])], (file -> size)%1024); // lo mismo pero metiendo el fichero en el tamaño
 		printf("--> %s", str);
 		//strncpy(str, &spbloque.datablocks[block_size*(file -> datablocks[0])], file->size);
-		strcpy(buf, str);
+		strcpy(buf, str); // copia del buffer
 	}
 	return file->size;
 }
@@ -619,8 +516,6 @@ int myrename(const char* from, const char* to) {
 	printf(":%s:\n", file->name);
 	printf(":%s:\n", file->path);
 
-	save_contents();
-
 	return 0;
 }
 
@@ -632,41 +527,40 @@ int mywrite(const char *path, const char *buf, size_t size, off_t offset, struct
 
 	printf("WRITING\n");
 
-	char * pathname = malloc(sizeof(path)+1);
-	strcpy(pathname, path);
+	char * pathname = malloc(sizeof(path)+1);//Reservo espacio para el directorio
+	strcpy(pathname, path);//Añado directorio del padre
 
-	filetype * file = filetype_from_path(pathname);
-	if(file == NULL)
+	filetype * file = filetype_from_path(pathname);//Busco que tipo de estructura es desde el path
+	if(file == NULL)//Si da error
 		return -ENOENT;
 
-	int indexno = (file->blocks)-1;
+	int indexno = (file->blocks)-1;//Guardo cuantos bloques ocupa el fichero
 
-	if(file -> size == 0){
-		strcpy(&spbloque.datablocks[block_size*((file -> datablocks)[0])], buf);
-		file -> size = strlen(buf);
-		(file -> blocks)++;
+	if(file -> size == 0){//Si ocupa 0 bytes
+		strcpy(&spbloque.datablocks[block_size*((file -> datablocks)[0])], buf);//Copio lo que hay en el buffer en el primer bloque de datos del fichero 
+		file -> size = strlen(buf);//Actualizo el tamaño del fichero
+		(file -> blocks)++;//Aumento en uno el numero de bloques que ocupa el fichero
 	}
-	else{
-		int currblk = (file->blocks)-1;
-		int len1 = 1024 - (file -> size % 1024);
-		if(len1 >= strlen(buf)){
-			strcat(&spbloque.datablocks[block_size*((file -> datablocks)[currblk])], buf);
-			file -> size += strlen(buf);
-			printf("---> %s\n", &spbloque.datablocks[block_size*((file -> datablocks)[currblk])]);
+	else{//Si ocupa mas espacio
+		int currblk = (file->blocks)-1;//Guardao numero de bloques usados
+		int len1 = 1024 - (file -> size % 1024);//Calculo tamaño que me queda en el fichero
+		if(len1 >= strlen(buf)){//Si cabe
+			strcat(&spbloque.datablocks[block_size*((file -> datablocks)[currblk])], buf);//Escribo en el bloque de datos disponible lo que hay en el buffer
+			file -> size += strlen(buf);//Actualizo el tamaño del fichero
+			printf("---> %s\n", &spbloque.datablocks[block_size*((file -> datablocks)[currblk])]);//
 		}
 		else{
-			char * cpystr = malloc(1024*sizeof(char));
-			strncpy(cpystr, buf, len1-1);
-			strcat(&spbloque.datablocks[block_size*((file -> datablocks)[currblk])], cpystr);
-			strcpy(cpystr, buf);
-			strcpy(&spbloque.datablocks[block_size*((file -> datablocks)[currblk+1])], (cpystr+len1-1));
-			file -> size += strlen(buf);
+			char * cpystr = malloc(1024*sizeof(char));//Añadir nuevo bloque 
+			strncpy(cpystr, buf, len1-1);//Copio en el nuevo bloque lo que queda del buffer
+			strcat(&spbloque.datablocks[block_size*((file -> datablocks)[currblk])], cpystr);//Indexo el puntero del bloque a la ultima posicion de bloques de datos
+			strcpy(cpystr, buf);//Copio en el bloque lo que hay en el buffer
+			strcpy(&spbloque.datablocks[block_size*((file -> datablocks)[currblk+1])], (cpystr+len1-1));//Meto en el siguiente bloque lo que sobra
+			file -> size += strlen(buf);//Actualizo tamaño del fichero
 			printf("---> %s\n", &spbloque.datablocks[block_size*((file -> datablocks)[currblk])]);
-			(file -> blocks)++;
+			(file -> blocks)++;//Actualizo numero de bloques 
 		}
 
 	}
-	save_contents();
 
 	return strlen(buf);
 }
@@ -674,18 +568,18 @@ int mywrite(const char *path, const char *buf, size_t size, off_t offset, struct
 static struct fuse_operations operations =
 {
 	//--------------
-	.mkdir=mymkdir,
-	.getattr=mygetattr,
-	.readdir=myreaddir,
-	//--------------
-	.rmdir=myrmdir,
-	.open=myopen,
-	.read=myread,
-	//--------------
-	.write=mywrite,
+	.mkdir=mymkdir,//listo.
+	.getattr=mygetattr,//
+	.readdir=myreaddir, // listo
+	//---------------
+	.rmdir=myrmdir,//listo.
+	.open=myopen, //listo
+	.read=myread, //liste
+	//---------------
+	.write=mywrite, //Listo
 	.create=mycreate,
 	.rename=myrename,
-	//--------------
+	//---------------
 	.unlink=myrm,
 };
 

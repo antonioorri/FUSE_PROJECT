@@ -12,6 +12,7 @@
 
 #define block_size 1024
 
+
 typedef struct superbloque {
 	char datablocks[block_size*100];		//total number of data blocks
 	char data_bitmap[105];      			//array of data block numbers that are available
