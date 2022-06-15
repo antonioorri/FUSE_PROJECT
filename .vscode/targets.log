@@ -1,4 +1,6 @@
 make all --print-data-base --no-builtin-variables --no-builtin-rules --question
+make: *** No rule to make target 'all'.  Stop.
+
 # GNU Make 4.2.1
 # Built for x86_64-pc-linux-gnu
 # Copyright (C) 1988-2016 Free Software Foundation, Inc.
@@ -6,7 +8,7 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Tue Jun 14 23:38:13 2022
+# Make data base, printed on Wed Jun 15 11:56:08 2022
 
 # Variables
 
@@ -49,7 +51,7 @@ VTE_VERSION = 6003
 # environment
 VSCODE_NLS_CONFIG = {"locale":"en-us","availableLanguages":{},"_languagePackSupport":true}
 # environment
-JOURNAL_STREAM = 8:157322
+JOURNAL_STREAM = 8:48470
 # environment
 XDG_CONFIG_DIRS = /etc/xdg/xdg-ubuntu:/etc/xdg
 # environment
@@ -73,7 +75,7 @@ DBUS_SESSION_BUS_ADDRESS = unix:path=/run/user/1000/bus
 # environment
 VSCODE_VERBOSE_LOGGING = true
 # environment
-MANAGERPID = 12558
+MANAGERPID = 1765
 # environment
 LESSOPEN = | /usr/bin/lesspipe %s
 # environment
@@ -89,7 +91,7 @@ PATH = /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/
 # environment
 GPG_AGENT_INFO = /run/user/1000/gnupg/S.gpg-agent:0:1
 # environment
-SESSION_MANAGER = local/antonio-All-Series:@/tmp/.ICE-unix/12768,unix/antonio-All-Series:/tmp/.ICE-unix/12768
+SESSION_MANAGER = local/antonio-All-Series:@/tmp/.ICE-unix/1981,unix/antonio-All-Series:/tmp/.ICE-unix/1981
 # environment
 XDG_RUNTIME_DIR = /run/user/1000
 # environment
@@ -107,7 +109,7 @@ DISABLE_WAYLAND = 1
 # environment
 ELECTRON_RUN_AS_NODE = 1
 # environment
-INVOCATION_ID = e5c0824139b94d8dbf10fa9b6b27b987
+INVOCATION_ID = 14b886d2ba74498d9845fdec4518456b
 # environment
 GDK_PIXBUF_MODULEDIR = /snap/code/98/usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders
 # default
@@ -131,7 +133,7 @@ PWD = /home/antonio/FUSE/FUSE_PROJECT
 # default
 .LOADED := 
 # environment
-SSH_AGENT_PID = 12731
+SSH_AGENT_PID = 1944
 # environment
 ORIGINAL_XDG_CURRENT_DESKTOP = ubuntu:GNOME
 # environment
@@ -185,7 +187,7 @@ SHLVL = 1
 # environment
 GNOME_SHELL_SESSION_MODE = ubuntu
 # environment
-VSCODE_IPC_HOOK_EXTHOST = /run/user/1000/vscode-ipc-819303b7-6e86-44e9-9b42-b4230541db07.sock
+VSCODE_IPC_HOOK_EXTHOST = /run/user/1000/vscode-ipc-ab6d627f-0c96-4b3f-909e-16ce8fcb72a5.sock
 # default
 MAKE_VERSION := 4.2.1
 # environment
@@ -205,7 +207,7 @@ LC_TELEPHONE = es_ES.UTF-8
 # default
 MAKE_COMMAND := make
 # environment
-OLDPWD = /home/antonio/FUSE/FUSE_PROJECT/hola
+OLDPWD = /home/antonio/FUSE
 # default
 .VARIABLES := 
 # automatic
@@ -225,6 +227,8 @@ GDK_BACKEND = x11
 # environment
 LC_PAPER = es_ES.UTF-8
 # environment
+LC_IDENTIFICATION = es_ES.UTF-8
+# environment
 QT_ACCESSIBILITY = 1
 # default
 MAKEFILES := 
@@ -241,13 +245,15 @@ SNAP_NAME = code
 # environment
 LC_ALL = C
 # environment
-GNOME_TERMINAL_SCREEN = /org/gnome/Terminal/screen/e657a5de_22da_4c48_ac10_d22726fa6895
+GJS_DEBUG_TOPICS = JS ERROR;JS LOG
+# environment
+GNOME_TERMINAL_SCREEN = /org/gnome/Terminal/screen/867180cf_7fec_45b3_8ff9_96a9851dd678
 # makefile (from 'Makefile', line 1)
 fuse_flags = -D_FILE_OFFSET_BITS=64 -lfuse -pthread
 # automatic
 ^F = $(notdir $^)
 # environment
-GNOME_TERMINAL_SERVICE = :1.336
+GNOME_TERMINAL_SERVICE = :1.109
 # default
 SUFFIXES := 
 # environment
@@ -259,7 +265,7 @@ WINDOWPATH = 2
 # default
 .INCLUDE_DIRS = /usr/include /usr/local/include /usr/include
 # environment
-LC_IDENTIFICATION = es_ES.UTF-8
+GJS_DEBUG_OUTPUT = stderr
 # default
 .RECIPEPREFIX := 
 # environment
@@ -269,9 +275,9 @@ LANG = C
 # environment
 TERM = xterm-256color
 # environment
-VSCODE_PID = 69962
+VSCODE_PID = 8019
 # variable set hash-table stats:
-# Load=130/1024=13%, Rehash=0, Collisions=19/155=12%
+# Load=132/1024=13%, Rehash=0, Collisions=20/157=13%
 
 # Pattern-specific Variable Values
 
@@ -279,9 +285,9 @@ VSCODE_PID = 69962
 
 # Directories
 
-# . (device 2050, inode 12058630): 10 files, no impossibilities.
+# . (device 2050, inode 12060876): 13 files, no impossibilities.
 
-# 10 files, no impossibilities in 1 directories.
+# 13 files, no impossibilities in 1 directories.
 
 # Implicit Rules
 
@@ -292,11 +298,9 @@ VSCODE_PID = 69962
 fusesinho: fusesinho.o fusesinho.h
 #  Implicit rule search has not been done.
 #  Modification time never checked.
- 
-make: *** No rule to make target 'all'.  Stop.
-
 #  File has not been updated.
 #  recipe to execute (from 'Makefile', line 4):
+ 
 	gcc -g -o $@  $^ ${fuse_flags}
 	mkdir -p $(montaje)
 	
@@ -324,7 +328,7 @@ umount:
 # Not a target:
 Makefile:
 #  Implicit rule search has been done.
-#  Last modified 2022-06-14 21:35:26.794220943
+#  Last modified 2022-06-15 11:54:50.252226536
 #  File has been updated.
 #  Successfully updated.
 
@@ -369,12 +373,12 @@ fusesinho.c:
 
 # No general ('VPATH' variable) search path.
 
-# strcache buffers: 1 (0) / strings = 20 / storage = 166 B / avg = 8 B
-# current buf: size = 8162 B / used = 166 B / count = 20 / avg = 8 B
+# strcache buffers: 1 (0) / strings = 21 / storage = 176 B / avg = 8 B
+# current buf: size = 8162 B / used = 176 B / count = 21 / avg = 8 B
 
-# strcache performance: lookups = 35 / hit rate = 42%
+# strcache performance: lookups = 38 / hit rate = 44%
 # hash-table stats:
-# Load=20/8192=0%, Rehash=0, Collisions=6/35=17%
-# Finished Make data base on Tue Jun 14 23:38:13 2022
+# Load=21/8192=0%, Rehash=0, Collisions=7/38=18%
+# Finished Make data base on Wed Jun 15 11:56:08 2022
 
  
