@@ -23,13 +23,11 @@ typedef struct inode {
 	int datablocks[16];            //bloque de datos que apunta el inodo
 	int number;
 	int blocks;                    
-	//int link;                    /
 	int size;                      //tamaño del archivo o directorio
 } inode;
 
 typedef struct filetype {
 	int valid;
-	char test[10];
 	char path[100];
 	char name[100];           //nombre
 	inode *inum;              //número de inodo
@@ -48,7 +46,20 @@ typedef struct filetype {
 	off_t size;                     // tamaño del nodo
 
 	int datablocks[16];
-	int number;
-	int blocks;
+	int number;						//id
+	int blocks;						//Numero de bloques ocupados
 
 } filetype;
+
+void initialize_superbloque();
+void initialize_root_directory();
+filetype *filetype_from_path(char *path);
+void inodos_libres();
+void bloques_libres();
+int encontrar_libre_inodo();
+int encontrar_libre_db();
+void add_child(filetype *parent, filetype *child);
+static int mymkdir(const char *path, mode_t mode);
+
+
+
