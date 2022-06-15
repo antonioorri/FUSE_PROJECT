@@ -17,4 +17,4 @@ umount:
 	fusermount -u $(montaje)
 
 clean:
-	rm *.o -r $(montaje)
+	rm *.o -r $(montaje) fusesinho

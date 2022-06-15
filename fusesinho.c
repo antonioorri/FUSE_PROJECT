@@ -5,11 +5,11 @@ Grupo C
 Hecho por Aĺvaro, Antonio y Juan
 Team pichasgordas
 
-Version 1.1.2 ❤️😒😊😭😩😍😔😁💕💕💕💕😊😊😊😊
+Version 1.1.4 ❤️😒😊😭😩😍😔😁💕💕💕💕😊😊😊😊
 😍😍😍😍😍😍😍😍😍😍😍😍😍😍😍😍😍😍😍😍😍😍😍😍😍😍😍😍
 
-gcc FS.c -o FS pkg-config fuse --cflags --libs
 */
+
 #define FUSE_USE_VERSION 30
 
 #include <fuse.h>
@@ -22,10 +22,6 @@ gcc FS.c -o FS pkg-config fuse --cflags --libs
 #include <sys/stat.h>
 #include <errno.h>
 #include "fusesinho.h"
-// gcc FS.c -o FS `pkg-config fuse --cflags --libs`
-// ./ FS - f Desktop / OS / mountpoint4
-
-
 
 
 
@@ -57,7 +53,7 @@ void initialize_root_directory() {
 	root->m_time = time(NULL);
 	root->b_time = time(NULL);
 
-	root -> permissions = S_IFDIR | 0777;
+	root -> permissions = S_IFDIR | 0775;
 
 	root -> size = 0;
 	root->group_id = getgid();
@@ -143,6 +139,11 @@ void inodos_libres(){
 		printf("%c ",spbloque.inode_bitmap[i]);
 	printf("\n");
 }
+void bloques_libres(){
+	for(int  i = 0; i < strlen(spbloque.data_bitmap); i++)
+		printf("%c ",spbloque.data_bitmap[i]);
+	printf("\n");
+}
 
 int find_free_inode(){
 	int i;
@@ -159,13 +160,15 @@ int find_free_inode(){
 }
 
 int find_free_db(){
-	for (int i = 1; i <strlen(spbloque.inode_bitmap); i++){
-		if(spbloque.inode_bitmap[i] == '0'){
-			spbloque.inode_bitmap[i] = '1';
+	bloques_libres();
+	for (int i = 1; i <strlen(spbloque.data_bitmap); i++){
+		if(spbloque.data_bitmap[i] == '0'){
+			spbloque.data_bitmap[i] = '1';
+			
 			return i;
 		}
-		
 	}
+	return -ENOENT;
 }
 
 void add_child(filetype * parent, filetype * child){ //Añade hijos 
@@ -385,7 +388,7 @@ int mycreate(const char * path, mode_t mode, struct fuse_file_info *fi) {
 //	printf("Vamos ha crear el archivo: ");
 	
 	int index = find_free_inode(); //Encuentro el inodo libre
-
+	
 	filetype * new_file = malloc(sizeof(filetype)); //Reservo espacio para un nuevo fichero 
 
 	char * pathname = malloc(strlen(path)+2); //Reservo espacio para la ruta
@@ -427,10 +430,7 @@ int mycreate(const char * path, mode_t mode, struct fuse_file_info *fi) {
 	new_file -> size = 0;
 	new_file->group_id = getgid();
 	new_file->user_id = getuid();
-
-
 	new_file -> number = index; //Le doy como id el inodo que habia libre
-
 	for(int i = 0; i < 16; i++){
 		(new_file -> datablocks)[i] = find_free_db(); //Asigno bloques de datos libres al nuevo fichero
 	}
@@ -540,6 +540,7 @@ int mywrite(const char *path, const char *buf, size_t size, off_t offset, struct
 		strcpy(&spbloque.datablocks[block_size*((file -> datablocks)[0])], buf);//Copio lo que hay en el buffer en el primer bloque de datos del fichero 
 		file -> size = strlen(buf);//Actualizo el tamaño del fichero
 		(file -> blocks)++;//Aumento en uno el numero de bloques que ocupa el fichero
+		printf("numero de bloques: %d",file->blocks);
 	}
 	else{//Si ocupa mas espacio
 		int currblk = (file->blocks)-1;//Guardao numero de bloques usados
