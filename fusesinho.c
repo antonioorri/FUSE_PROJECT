@@ -332,11 +332,11 @@ int myrm(const char * path){
 	char * pathname = malloc(strlen(path)+2);
 	strcpy(pathname, path);
 
-	char * rindex = strrchr(pathname, '/');
+	char * rindex = strrchr(pathname, '/'); //busca el path
 
-	char * folder_delete = malloc(strlen(rindex+1)+2);
+	char * folder_delete = malloc(strlen(rindex+1)+2); // suma al inodo para borrar el path
 
-	strcpy(folder_delete, rindex+1);
+	strcpy(folder_delete, rindex+1); 
 
 	*rindex = '\0';
 
@@ -345,16 +345,16 @@ int myrm(const char * path){
 
 	filetype * parent = filetype_from_path(pathname);
 
-	if(parent == NULL)
+	if(parent == NULL) // si no tiene padre ya está eliminado
 		return -ENOENT;
 
-	if(parent -> num_children == 0)
+	if(parent -> num_children == 0) // si el hijo está vacío ya está eliminado
 		return -ENOENT;
 
-	filetype * curr_child = (parent -> children)[0];
+	filetype * curr_child = (parent -> children)[0]; // hace que cuando
 	int index = 0;
-	while(index < (parent -> num_children)){
-		if(strcmp(curr_child -> name, folder_delete) == 0){
+	while(index < (parent -> num_children)){  // elimines al padre
+		if(strcmp(curr_child -> name, folder_delete) == 0){  // elimine al hijo
 			break;
 		}
 		index++;
@@ -362,7 +362,7 @@ int myrm(const char * path){
 	}
 
 	if(index < (parent -> num_children)){
-		if(((parent -> children)[index] -> num_children) != 0)
+		if(((parent -> children)[index] -> num_children) != 0) // calcula el numero de archivos dle hijo
 			return -ENOTEMPTY;
 		for(int i = index+1; i < (parent -> num_children); i++){
 			(parent -> children)[i-1] = (parent -> children)[i];
