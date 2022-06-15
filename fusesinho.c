@@ -392,7 +392,6 @@ int mycreate(const char * path, mode_t mode, struct fuse_file_info *fi) {
 	strcpy(pathname, path); //Añado la ruta del padre
 
 	char * rindex = strrchr(pathname, '/'); //Busco la terminación del directorio
-	printf("rindex = %c \n", rindex);
 
 	
 	strcpy(new_file -> name, rindex+1); //Le añado el nombre al path
