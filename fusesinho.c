@@ -73,62 +73,62 @@ void initialize_root_directory() {
 
 
 
-filetype * filetype_from_path(char * path){
+filetype * filetype_from_path(char * path){ //Devuelve el directorio padre del fichero con ruta path
 	
 	char curr_folder[100];
-	char * path_name = malloc(strlen(path) + 2);
+	char * path_name = malloc(strlen(path) + 2); //Asigno espacio para la ruta
 
-	strcpy(path_name, path);
+	strcpy(path_name, path); //Indexo ruta del padre
 
-	filetype * curr_node = root;
+	filetype * curr_node = root; //Valor base es el root
 
 	fflush(stdin);
 
-	if(strcmp(path_name, "/") == 0)
-		return curr_node;
+	if(strcmp(path_name, "/") == 0) //Si path es / es que es root
+		return curr_node; //Devuelvo root
 
-	if(path_name[0] != '/'){
+	if(path_name[0] != '/'){//Si empieza distinto de / es error
 		printf("Path incorrecto\n");
 		exit(1);
 	}
 	else{
-		path_name++;
+		path_name++; //Aumento el puntero
 	}
 
-	if(path_name[strlen(path_name)-1] == '/'){
+	if(path_name[strlen(path_name)-1] == '/'){ //Si el final se ha puesto con / se quita
 		path_name[strlen(path_name)-1] = '\0';
 	}
 
 	char * index;
 	int flag = 0;
 
-	while(strlen(path_name) != 0){
-		index = strchr(path_name, '/');
+	while(strlen(path_name) != 0){ //Mientras la longitud de la ruta sea distinta de 0
+		index = strchr(path_name, '/'); //Busco /
 		printf("%s---\n",index);
 		
-		if(index != NULL){
+		if(index != NULL){ //Si lo encuentra es un directorio
 			printf("index distinto de null\n");
-			strncpy(curr_folder, path_name, index - path_name);
-			curr_folder[index-path_name] = '\0';
+			strncpy(curr_folder, path_name, index - path_name); //Guardo nombre de directorio 
+			curr_folder[index-path_name] = '\0'; 
 			
 			flag = 0;
-			for(int i = 0; i < curr_node -> num_children; i++){
-				if(strcmp((curr_node -> children)[i] -> name, curr_folder) == 0){
-					curr_node = (curr_node -> children)[i];
-					flag = 1;
+			for(int i = 0; i < curr_node -> num_children; i++){ //Por cada hijo del nodo actual (primera iteracion es root)
+				if(strcmp((curr_node -> children)[i] -> name, curr_folder) == 0){ //Comparo si coincide con el nombre del directorio
+					curr_node = (curr_node -> children)[i]; //Asgino el nodo actual al hijo que coincide
+					flag = 1; //Lo he encontrado
 					break;
 				}
 			}
 			if(flag == 0)
 				return NULL;
 		}
-		else{
-			strcpy(curr_folder, path_name);
+		else{ //Es fichero
+			strcpy(curr_folder, path_name); //Guardo ruta 
 			flag = 0;
-			for(int i = 0; i < curr_node -> num_children; i++){
-				if(strcmp((curr_node -> children)[i] -> name, curr_folder) == 0){
-					curr_node = (curr_node -> children)[i];
-					return curr_node;
+			for(int i = 0; i < curr_node -> num_children; i++){//Por cada hijo del nodo actual (primera iteracion es root)
+				if(strcmp((curr_node -> children)[i] -> name, curr_folder) == 0){//Comparo si coincide con el nombre del fichero
+					curr_node = (curr_node -> children)[i];//Asgino el nodo actual al hijo que coincide
+					return curr_node; //Devuelvo el nodo actual
 				}
 			}
 			return NULL;
@@ -168,12 +168,12 @@ int find_free_db(){
 	}
 }
 
-void add_child(filetype * parent, filetype * child){
-	(parent -> num_children)++;
+void add_child(filetype * parent, filetype * child){ //Añade hijos 
+	(parent -> num_children)++; //Incrementando numero de hijos que tiene
 
-	parent -> children = realloc(parent -> children, (parent -> num_children)*sizeof(filetype *));
+	parent -> children = realloc(parent -> children, (parent -> num_children)*sizeof(filetype *)); //Reservando espacio para el nuevo hijo
 
-	(parent -> children)[parent -> num_children - 1] = child;
+	(parent -> children)[parent -> num_children - 1] = child; //Agregagandolo a su array de hijos
 }
 
 static int mymkdir(const char *path, mode_t mode) {//Para crear carpetas
@@ -388,51 +388,52 @@ int mycreate(const char * path, mode_t mode, struct fuse_file_info *fi) {
 
 	filetype * new_file = malloc(sizeof(filetype)); //Reservo espacio para un nuevo fichero 
 
-	char * pathname = malloc(strlen(path)+2); 
-	strcpy(pathname, path);
+	char * pathname = malloc(strlen(path)+2); //Reservo espacio para la ruta
+	strcpy(pathname, path); //Añado la ruta del padre
 
-	char * rindex = strrchr(pathname, '/');
+	char * rindex = strrchr(pathname, '/'); //Busco la terminación del directorio
 	printf("rindex = %c \n", rindex);
 
 	
-	strcpy(new_file -> name, rindex+1);
-	strcpy(new_file -> path, pathname);
+	strcpy(new_file -> name, rindex+1); //Le añado el nombre al path
+	strcpy(new_file -> path, pathname); //Lo guardo en la ruta del nuevo fichero
 //	printf("%s\n",rindex+1);
 	*rindex = '\0';
 
-	if(strlen(pathname) == 0)
-		strcpy(pathname, "/");
+	if(strlen(pathname) == 0)//Si es el raiz
+		strcpy(pathname, "/"); //Le añado la /
 
-	new_file -> children = NULL;
+	//Inicializo los parametros que me quedan
+	new_file -> children = NULL; 
 	new_file -> num_children = 0;
-	new_file -> parent = filetype_from_path(pathname);
+	new_file -> parent = filetype_from_path(pathname); //Le añado el directorio del padre
 	new_file -> num_links = 0;
-	new_file -> valid = 1;
+	new_file -> valid = 1; //Es valido para escribir
 
 	if(new_file -> parent == NULL)
 	return -ENOENT;
 
-	add_child(new_file->parent, new_file);
+	add_child(new_file->parent, new_file); //Añade al hijo
 
 	//new_file -> type = malloc(10);
-	strcpy(new_file -> type, "file");
+	strcpy(new_file -> type, "file"); //Pongo su tipo
 
 	new_file->c_time = time(NULL);
 	new_file->a_time = time(NULL);
 	new_file->m_time = time(NULL);
 	new_file->b_time = time(NULL);
 
-	new_file -> permissions = S_IFREG | 0755;
+	new_file -> permissions = S_IFREG | 0755; //Le doy permiso de escritura lectura y ejecución solo para root y lecutura y escritura para los demas
 
 	new_file -> size = 0;
 	new_file->group_id = getgid();
 	new_file->user_id = getuid();
 
 
-	new_file -> number = index;
+	new_file -> number = index; //Le doy como id el inodo que habia libre
 
 	for(int i = 0; i < 16; i++){
-		(new_file -> datablocks)[i] = find_free_db();
+		(new_file -> datablocks)[i] = find_free_db(); //Asigno bloques de datos libres al nuevo fichero
 	}
 	new_file -> blocks = 0;
 	return 0;
@@ -527,10 +528,10 @@ int mywrite(const char *path, const char *buf, size_t size, off_t offset, struct
 
 	printf("WRITING\n");
 
-	char * pathname = malloc(sizeof(path)+1);//Reservo espacio para el directorio
-	strcpy(pathname, path);//Añado directorio del padre
+	char * pathname = malloc(sizeof(path)+1);//Reservo espacio para la ruta
+	strcpy(pathname, path);//Añado la ruta del padre
 
-	filetype * file = filetype_from_path(pathname);//Busco que tipo de estructura es desde el path
+	filetype * file = filetype_from_path(pathname);//Busco el directorio padre
 	if(file == NULL)//Si da error
 		return -ENOENT;
 
